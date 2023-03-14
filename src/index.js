@@ -6,7 +6,7 @@ import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
 import {
   createBrowserRouter,
-  RouterProvider,
+  RouterProvider
 } from "react-router-dom";
 import reportWebVitals from './reportWebVitals';
 import { Provider } from 'react-redux';
@@ -15,23 +15,29 @@ import promiseMiddleware from 'redux-promise';
 import ReduxThunk from 'redux-thunk';
 import Reducer from './redux/reducers';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import App from './App';
 
 const createStoreWithMiddleware = applyMiddleware(promiseMiddleware, ReduxThunk)(createStore);
-
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <ChatPage />,
-  },
-	{
-    path: "/login",
+	 element: <App />,
+	children: [
+		{
+			path: "chat",
+			element: <ChatPage />,
+		},
+		{
+    path: "login",
     element: <LoginPage />,
 	},
 	{
-    path: "/register",
+    path: "register",
     element: <RegisterPage />,
 	},
+	]
+  }
 ]);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
