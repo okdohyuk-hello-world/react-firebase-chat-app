@@ -22,20 +22,20 @@ const createStoreWithMiddleware = applyMiddleware(promiseMiddleware, ReduxThunk)
 const router = createBrowserRouter([
   {
     path: "/",
-	 element: <App />,
+	element: <App />,
 	children: [
 		{
 			path: "chat",
 			element: <ChatPage />,
 		},
 		{
-    path: "login",
-    element: <LoginPage />,
-	},
-	{
-    path: "register",
-    element: <RegisterPage />,
-	},
+    		path: "login",
+    		element: <LoginPage />,
+		},
+		{
+    		path: "register",
+    		element: <RegisterPage />,
+		},
 	]
   }
 ]);
