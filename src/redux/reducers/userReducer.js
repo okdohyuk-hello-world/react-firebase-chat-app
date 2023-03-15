@@ -2,7 +2,7 @@ import { SET_USER } from '../actions/types';
 
 const initialUserState = {
 	currentUser: null,
-	inLoading: true
+	isLoading: true
 }
 
 export default function (state = initialUserState, action) {

@@ -15,10 +15,10 @@ function App() {
 		onAuthStateChanged(auth, user => {
 			if(user) {
 				navigate('/chat');
-				dispatch(setUser(user));
 			} else {
 				navigate('/login');
 			};
+			dispatch(setUser(user));
 		});
 	}, []);
 	
