@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { IoIosChatboxes } from 'react-icons/io';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Image from 'react-bootstrap/Image';
@@ -8,10 +8,17 @@ import { auth } from '../../../assets/firebase';
 
 function UserPanel() {
   const user = useSelector(state => state.user.currentUser);
+  const imageInputRef = useRef();
 
   const handleLogout = () => {
     signOut(auth);
   };
+
+  const handleOpenImageInput = () => {
+    imageInputRef.current.click();
+  };
+
+  const handleUploadImage = () => {};
 
   return (
     <div>
@@ -32,12 +39,21 @@ function UserPanel() {
           </Dropdown.Toggle>
 
           <Dropdown.Menu>
-            <Dropdown.Item href="#/action-1">프로필 사진 변경</Dropdown.Item>
+            <Dropdown.Item href="#/action-1" onClick={handleOpenImageInput}>
+              프로필 사진 변경
+            </Dropdown.Item>
             <Dropdown.Item href="#/action-2" onClick={handleLogout}>
               로그아웃
             </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
+        <input
+          ref={imageInputRef}
+          onChange={handleUploadImage}
+          accept="image/jpeg, image/png"
+          style={{ display: 'none' }}
+          type="file"
+        />
       </div>
     </div>
   );
