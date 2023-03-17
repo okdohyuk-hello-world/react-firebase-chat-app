@@ -4,7 +4,9 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import Image from 'react-bootstrap/Image';
 import { useSelector } from 'react-redux';
 import { signOut } from 'firebase/auth';
-import { auth } from '../../../assets/firebase';
+import { auth, storage } from '../../../assets/firebase';
+import mime from 'mime-types';
+import { ref, uploadBytes } from 'firebase/storage';
 
 function UserPanel() {
   const user = useSelector(state => state.user.currentUser);
@@ -18,7 +20,20 @@ function UserPanel() {
     imageInputRef.current.click();
   };
 
-  const handleUploadImage = () => {};
+  const handleUploadImage = async event => {
+    const file = event.target.files[0];
+    const metadata = { contentType: mime.lookup(file.name) };
+    const storageRef = ref(storage, `images/user/${user.uid}`);
+
+    try {
+      // 스토리지에 파일 저장하기
+      let uploadTaskSnapshot = await uploadBytes(storageRef, file, metadata);
+
+      // 데이터베이스 업데이트
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   return (
     <div>
