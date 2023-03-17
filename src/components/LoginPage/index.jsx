@@ -17,7 +17,7 @@ function LoginPage() {
     try {
       setLoading(true);
 
-      const { user } = await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(auth, email, password);
     } catch (e) {
       setErrorFromSubmit(e.message);
       setTimeout(() => setErrorFromSubmit(''), 5000);
