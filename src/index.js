@@ -4,10 +4,7 @@ import './index.css';
 import ChatPage from './components/ChatPage';
 import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
-import {
-  createBrowserRouter,
-  RouterProvider
-} from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import reportWebVitals from './reportWebVitals';
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
@@ -21,36 +18,37 @@ const createStoreWithMiddleware = applyMiddleware(promiseMiddleware, ReduxThunk)
 
 const router = createBrowserRouter([
   {
-    path: "/",
-	element: <App />,
-	children: [
-		{
-			path: "chat",
-			element: <ChatPage />,
-		},
-		{
-    		path: "login",
-    		element: <LoginPage />,
-		},
-		{
-    		path: "register",
-    		element: <RegisterPage />,
-		},
-	]
-  }
+    path: '/',
+    element: <App />,
+    children: [
+      {
+        path: 'chat',
+        element: <ChatPage />,
+      },
+      {
+        path: 'login',
+        element: <LoginPage />,
+      },
+      {
+        path: 'register',
+        element: <RegisterPage />,
+      },
+    ],
+  },
 ]);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-		<Provider store={createStoreWithMiddleware(
-			Reducer,
-			window.__REDUX_DEVTOOLS_EXTENSION__ &&
-			window.__REDUX_DEVTOOLS_EXTENSION__()
-			)} >
-    		<RouterProvider router={router} />
-		</Provider>
-  </React.StrictMode>
+    <Provider
+      store={createStoreWithMiddleware(
+        Reducer,
+        window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
+      )}
+    >
+      <RouterProvider router={router} />
+    </Provider>
+  </React.StrictMode>,
 );
 
 // If you want to start measuring performance in your app, pass a function
