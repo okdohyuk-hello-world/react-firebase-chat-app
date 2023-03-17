@@ -2,15 +2,18 @@ import React, { useRef } from 'react';
 import { IoIosChatboxes } from 'react-icons/io';
 import Dropdown from 'react-bootstrap/Dropdown';
 import Image from 'react-bootstrap/Image';
-import { useSelector } from 'react-redux';
-import { signOut } from 'firebase/auth';
-import { auth, storage } from '../../../assets/firebase';
+import { useSelector, useDispatch } from 'react-redux';
+import { signOut, updateProfile, getAuth } from 'firebase/auth';
+import { auth, storage, db } from '../../../assets/firebase';
 import mime from 'mime-types';
-import { ref, uploadBytes } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { update, ref as databaseRef } from 'firebase/database';
+import { setPhotoURL } from '../../../redux/actions/userAction';
 
 function UserPanel() {
   const user = useSelector(state => state.user.currentUser);
   const imageInputRef = useRef();
+  const dispatch = useDispatch();
 
   const handleLogout = () => {
     signOut(auth);
@@ -27,11 +30,25 @@ function UserPanel() {
 
     try {
       // 스토리지에 파일 저장하기
-      let uploadTaskSnapshot = await uploadBytes(storageRef, file, metadata);
+      await uploadBytes(storageRef, file, metadata);
+
+      // 유저 업데이트
+      let downloadURL = await getDownloadURL(storageRef);
+      const auth = getAuth();
+
+      await updateProfile(auth.currentUser, {
+        photoURL: downloadURL,
+      });
 
       // 데이터베이스 업데이트
+      await update(databaseRef(db, 'users/' + user.uid), {
+        image: downloadURL,
+      });
+
+      // 스토어 업데이트
+      dispatch(setPhotoURL(downloadURL));
     } catch (e) {
-      console.error(e);
+      alert(e);
     }
   };
 
