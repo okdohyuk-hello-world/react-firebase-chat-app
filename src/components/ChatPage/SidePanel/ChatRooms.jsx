@@ -4,7 +4,7 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { connect } from 'react-redux';
-import { ref, child, push, update } from 'firebase/database';
+import { ref, child, push, update, onValue } from 'firebase/database';
 import { db } from '../../../assets/firebase';
 
 class ChatRooms extends Component {
@@ -15,7 +15,12 @@ class ChatRooms extends Component {
     description: '',
     isDesabled: true,
     chatRoomsRef: ref(db, 'chatRooms'),
+    chatRooms: [],
   };
+
+  componentDidMount() {
+    this.addChatRoomsListeners();
+  }
 
   componentWillUpdate(nextProps, { isDesabled, name, description }) {
     if (this.state.isDesabled !== isDesabled) return;
@@ -27,6 +32,15 @@ class ChatRooms extends Component {
       this.setState({ isDesabled: true });
     }
   }
+
+  renderChatRooms = chatRooms =>
+    chatRooms.length && chatRooms.map(room => <li key={room.id}># {room.name}</li>);
+
+  addChatRoomsListeners = () => {
+    onValue(this.state.chatRoomsRef, snapshot => {
+      this.setState({ chatRooms: Object.values(snapshot.val()) });
+    });
+  };
 
   addChatRoom = async () => {
     this.setState({ isLoading: true });
@@ -75,12 +89,16 @@ class ChatRooms extends Component {
       <div>
         <div style={{ position: 'relative', width: '100%', display: 'flex', alignItems: 'center' }}>
           <FaRegSmileWink style={{ marginRight: 3 }} />
-          CHAT ROOMS (1)
+          CHAT ROOMS ({this.state.chatRooms.length})
           <FaPlus
             onClick={this.handleModalShow}
             style={{ position: 'absolute', right: 0, cursor: 'pointer' }}
           />
         </div>
+
+        <ul style={{ listStyleType: 'none', padding: 0 }}>
+          {this.renderChatRooms(this.state.chatRooms)}
+        </ul>
 
         <Modal show={this.state.isModalShow} onHide={this.handleModalClose}>
           <Modal.Header closeButton>
