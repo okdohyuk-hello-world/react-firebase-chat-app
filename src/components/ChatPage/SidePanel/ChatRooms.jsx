@@ -3,12 +3,66 @@ import { FaRegSmileWink, FaPlus } from 'react-icons/fa';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
+import { connect } from 'react-redux';
+import { ref, child, push, update } from 'firebase/database';
+import { db } from '../../../assets/firebase';
 
 class ChatRooms extends Component {
-  state = { isModalShow: false };
+  state = {
+    isModalShow: false,
+    isLoading: false,
+    name: '',
+    description: '',
+    chatRoomsRef: ref(db, 'chatRooms'),
+  };
+
+  isFormValid = (name, description) => name && description;
+
+  addChatRoom = async () => {
+    this.setState({ isLoading: true });
+    const key = push(this.state.chatRoomsRef, 'chatRooms').key;
+    const { name, description } = this.state;
+    const { user } = this.props;
+    const newChatRoom = {
+      id: key,
+      name: name,
+      description: description,
+      createdBy: {
+        name: user.displayName,
+        image: user.photoURL,
+      },
+    };
+
+    try {
+      await update(child(this.state.chatRoomsRef, key), newChatRoom);
+      this.setState({
+        name: '',
+        description: '',
+        isDesabled: true,
+        isModalShow: false,
+      });
+    } catch (e) {
+      console.error(e);
+      alert(e);
+    } finally {
+      this.setState({
+        isLoading: false,
+      });
+    }
+  };
 
   handleModalClose = () => this.setState({ isModalShow: false });
   handleModalShow = () => this.setState({ isModalShow: true });
+
+  handleSubmit = e => {
+    e.preventDefault();
+    if (this.state.isLoading) return;
+    const { name, description } = this.state;
+
+    if (this.isFormValid(name, description)) {
+      this.addChatRoom();
+    }
+  };
 
   render() {
     return (
@@ -27,15 +81,23 @@ class ChatRooms extends Component {
             <Modal.Title>Create a chat room</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <Form>
+            <Form onSubmit={this.handleSubmit}>
               <Form.Group className="mb-3" controlId="formBasicEmail">
                 <Form.Label>방 이름</Form.Label>
-                <Form.Control type="text" placeholder="Enter a room name" />
+                <Form.Control
+                  onChange={e => this.setState({ name: e.target.value })}
+                  type="text"
+                  placeholder="Enter a room name"
+                />
               </Form.Group>
 
               <Form.Group className="mb-3" controlId="formBasicPassword">
                 <Form.Label>방 설명</Form.Label>
-                <Form.Control type="text" placeholder="Enter a chat room description" />
+                <Form.Control
+                  onChange={e => this.setState({ description: e.target.value })}
+                  type="text"
+                  placeholder="Enter a chat room description"
+                />
               </Form.Group>
             </Form>
           </Modal.Body>
@@ -43,8 +105,13 @@ class ChatRooms extends Component {
             <Button variant="secondary" onClick={this.handleModalClose}>
               Close
             </Button>
-            <Button variant="primary" onClick={this.handleModalClose}>
-              Save Changes
+            <Button
+              onClick={this.handleSubmit}
+              type="submit"
+              variant="primary"
+              disabled={this.state.isLoading}
+            >
+              Create
             </Button>
           </Modal.Footer>
         </Modal>
@@ -53,4 +120,8 @@ class ChatRooms extends Component {
   }
 }
 
-export default ChatRooms;
+const mapStateToProps = state => {
+  return { user: state.user.currentUser };
+};
+
+export default connect(mapStateToProps)(ChatRooms);
