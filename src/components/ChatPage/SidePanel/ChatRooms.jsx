@@ -13,10 +13,20 @@ class ChatRooms extends Component {
     isLoading: false,
     name: '',
     description: '',
+    isDesabled: true,
     chatRoomsRef: ref(db, 'chatRooms'),
   };
 
-  isFormValid = (name, description) => name && description;
+  componentWillUpdate(nextProps, { isDesabled, name, description }) {
+    if (this.state.isDesabled !== isDesabled) return;
+    if (this.state.name === name && this.state.description === description) return;
+
+    if (name && description) {
+      this.setState({ isDesabled: false });
+    } else {
+      this.setState({ isDesabled: true });
+    }
+  }
 
   addChatRoom = async () => {
     this.setState({ isLoading: true });
@@ -56,12 +66,8 @@ class ChatRooms extends Component {
 
   handleSubmit = e => {
     e.preventDefault();
-    if (this.state.isLoading) return;
-    const { name, description } = this.state;
 
-    if (this.isFormValid(name, description)) {
-      this.addChatRoom();
-    }
+    this.addChatRoom();
   };
 
   render() {
@@ -85,6 +91,7 @@ class ChatRooms extends Component {
               <Form.Group className="mb-3" controlId="formBasicEmail">
                 <Form.Label>방 이름</Form.Label>
                 <Form.Control
+                  value={this.state.name}
                   onChange={e => this.setState({ name: e.target.value })}
                   type="text"
                   placeholder="Enter a room name"
@@ -94,6 +101,7 @@ class ChatRooms extends Component {
               <Form.Group className="mb-3" controlId="formBasicPassword">
                 <Form.Label>방 설명</Form.Label>
                 <Form.Control
+                  value={this.state.description}
                   onChange={e => this.setState({ description: e.target.value })}
                   type="text"
                   placeholder="Enter a chat room description"
@@ -109,7 +117,7 @@ class ChatRooms extends Component {
               onClick={this.handleSubmit}
               type="submit"
               variant="primary"
-              disabled={this.state.isLoading}
+              disabled={this.state.isDesabled || this.state.isLoading}
             >
               Create
             </Button>
