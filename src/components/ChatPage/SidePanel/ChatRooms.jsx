@@ -4,7 +4,7 @@ import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { connect } from 'react-redux';
-import { ref, child, push, update, onValue } from 'firebase/database';
+import { ref, child, push, update, onValue, off } from 'firebase/database';
 import { db } from '../../../assets/firebase';
 import { setCurrentChatRoom } from '../../../redux/actions/chatRoomAction';
 
@@ -23,6 +23,10 @@ class ChatRooms extends Component {
 
   componentDidMount() {
     this.addChatRoomsListeners();
+  }
+
+  componentWillUnmount() {
+    off(this.state.chatRoomsRef);
   }
 
   componentWillUpdate(nextProps, { isDesabled, name, description }) {
