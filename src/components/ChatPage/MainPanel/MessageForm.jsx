@@ -5,7 +5,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { db, storage } from '../../../assets/firebase';
 import { ref, serverTimestamp, push, child } from 'firebase/database';
-import { ref as sRef, uploadBytes } from 'firebase/storage';
+import { ref as sRef, uploadBytesResumable } from 'firebase/storage';
 import { useSelector } from 'react-redux';
 import mime from 'mime-types';
 
@@ -14,6 +14,7 @@ function MessageForm() {
   const user = useSelector(state => state.user.currentUser);
   const [content, setContent] = useState('');
   const [errors, setErrors] = useState([]);
+  const [percentage, setPercentage] = useState(0);
   const [loading, setLoading] = useState(false);
   const messagesRef = ref(db, 'messages');
   const inputOpenImageRef = useRef();
@@ -26,14 +27,19 @@ function MessageForm() {
     inputOpenImageRef.current.click();
   };
 
-  const handleUploadImage = async e => {
+  const handleUploadImage = e => {
     const file = e.target.files[0];
     const filePath = `/message/public/${file.name}`;
     const metadata = { contentType: mime.lookup(file.name) };
     const storageRef = sRef(storage, filePath);
 
     try {
-      await uploadBytes(storageRef, file, metadata);
+      let uploadTask = uploadBytesResumable(storageRef, file, metadata);
+
+      uploadTask.on('state_changed', snapshot => {
+        const percentage = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+        setPercentage(percentage);
+      });
     } catch (e) {
       alert(e);
     }
@@ -88,7 +94,14 @@ function MessageForm() {
         </Form.Group>
       </Form>
 
-      <ProgressBar style={{ marginTop: '1rem' }} variant="warning" label="60%" now={60} />
+      {!(percentage === 0 || percentage === 100) && (
+        <ProgressBar
+          style={{ marginTop: '1rem' }}
+          variant="warning"
+          label={percentage + '%'}
+          now={percentage}
+        />
+      )}
 
       <div>
         {errors.map(errorMsg => (
