@@ -4,7 +4,7 @@ import Message from './Message';
 import MessageForm from './MessageForm';
 import { connect } from 'react-redux';
 import { db } from '../../../assets/firebase';
-import { ref, child, onValue } from 'firebase/database';
+import { ref, child, onValue, off } from 'firebase/database';
 
 class MainPanel extends Component {
   state = {
@@ -21,9 +21,15 @@ class MainPanel extends Component {
     }
   }
 
+  componentWillUnmount() {
+    off(this.state.messagesRef);
+  }
+
   addMessagesListeners = chatRoomId => {
     onValue(child(this.state.messagesRef, chatRoomId), snapshot => {
-      this.setState({ messages: Object.values(snapshot.val()), messagesLoading: false });
+      let messageArray = [];
+      if (snapshot.val() !== null) messageArray = Object.values(snapshot.val());
+      this.setState({ messages: messageArray, messagesLoading: false });
     });
   };
 
