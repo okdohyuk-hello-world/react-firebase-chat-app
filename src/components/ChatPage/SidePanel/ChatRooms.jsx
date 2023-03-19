@@ -6,6 +6,7 @@ import Form from 'react-bootstrap/Form';
 import { connect } from 'react-redux';
 import { ref, child, push, update, onValue } from 'firebase/database';
 import { db } from '../../../assets/firebase';
+import { setCurrentChatRoom } from '../../../redux/actions/chatRoomAction';
 
 class ChatRooms extends Component {
   state = {
@@ -16,6 +17,8 @@ class ChatRooms extends Component {
     isDesabled: true,
     chatRoomsRef: ref(db, 'chatRooms'),
     chatRooms: [],
+    isFirstLoad: true,
+    activeChatRoomId: '',
   };
 
   componentDidMount() {
@@ -34,11 +37,23 @@ class ChatRooms extends Component {
   }
 
   renderChatRooms = chatRooms =>
-    chatRooms.length && chatRooms.map(room => <li key={room.id}># {room.name}</li>);
+    chatRooms.length &&
+    chatRooms.map(room => (
+      <li
+        key={room.id}
+        onClick={() => this.changeChatRoom(room)}
+        style={{
+          cursor: 'pointer',
+          backgroundColor: room.id === this.state.activeChatRoomId && '#ffffff45',
+        }}
+      >
+        # {room.name}
+      </li>
+    ));
 
   addChatRoomsListeners = () => {
     onValue(this.state.chatRoomsRef, snapshot => {
-      this.setState({ chatRooms: Object.values(snapshot.val()) });
+      this.setState({ chatRooms: Object.values(snapshot.val()) }, () => this.setFirstChatRoom());
     });
   };
 
@@ -73,6 +88,20 @@ class ChatRooms extends Component {
         isLoading: false,
       });
     }
+  };
+
+  setFirstChatRoom = () => {
+    const firstChatRoom = this.state.chatRooms[0];
+    if (this.state.isFirstLoad && this.state.chatRooms.length) {
+      this.props.dispatch(setCurrentChatRoom(firstChatRoom));
+
+      this.setState({ isFirstLoad: false, activeChatRoomId: firstChatRoom.id });
+    }
+  };
+
+  changeChatRoom = room => {
+    this.props.dispatch(setCurrentChatRoom(room));
+    this.setState({ activeChatRoomId: room.id });
   };
 
   handleModalClose = () => this.setState({ isModalShow: false });
