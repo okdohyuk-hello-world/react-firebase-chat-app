@@ -68,7 +68,7 @@ function MessageForm() {
         </Form.Group>
       </Form>
 
-      <ProgressBar variant="warning" label="60%" now={60} />
+      <ProgressBar style={{ marginTop: '1rem' }} variant="warning" label="60%" now={60} />
 
       <div>
         {errors.map(errorMsg => (
