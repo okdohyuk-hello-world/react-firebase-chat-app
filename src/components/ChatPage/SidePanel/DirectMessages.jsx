@@ -24,8 +24,23 @@ class DirectMessages extends Component {
     });
   };
 
+  getChatRoomId = userId => {
+    const currentUserId = this.props.user.uid;
+
+    return userId > currentUserId ? `${userId}/${currentUserId}` : `${currentUserId}/${userId}`;
+  };
+
+  changeChatRoom = user => {
+    const chatRoomId = this.getChatRoomId(user.uid);
+  };
+
   renderDirectMessages = users =>
-    users.length > 0 && users.map(user => <li key={user.uid}># {user.name}</li>);
+    users.length > 0 &&
+    users.map(user => (
+      <li key={user.uid} onClick={() => this.changeChatRoom(user)}>
+        # {user.name}
+      </li>
+    ));
 
   render() {
     const { users } = this.state;
