@@ -5,7 +5,7 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { db, storage } from '../../../assets/firebase';
 import { ref, serverTimestamp, push, child } from 'firebase/database';
-import { ref as sRef, uploadBytesResumable } from 'firebase/storage';
+import { ref as sRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { useSelector } from 'react-redux';
 import mime from 'mime-types';
 
@@ -33,13 +33,29 @@ function MessageForm() {
     const metadata = { contentType: mime.lookup(file.name) };
     const storageRef = sRef(storage, filePath);
 
+    setLoading(true);
+
     try {
       let uploadTask = uploadBytesResumable(storageRef, file, metadata);
 
-      uploadTask.on('state_changed', snapshot => {
-        const percentage = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-        setPercentage(percentage);
-      });
+      uploadTask.on(
+        'state_changed',
+        snapshot => {
+          const percentage = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+          setPercentage(percentage);
+        },
+        err => {
+          console.error(err);
+          setLoading(false);
+        },
+        () => {
+          // 데이터 베이스 저장
+          getDownloadURL(storageRef).then(downloadURL => {
+            push(child(messagesRef, chatRoom.id), createMessage(downloadURL));
+            setLoading(false);
+          });
+        },
+      );
     } catch (e) {
       alert(e);
     }
@@ -113,7 +129,12 @@ function MessageForm() {
 
       <Row>
         <Col>
-          <button onClick={handleSubmit} className="message-form-button" style={{ width: '100%' }}>
+          <button
+            onClick={handleSubmit}
+            className="message-form-button"
+            style={{ width: '100%' }}
+            disabled={loading}
+          >
             SEND
           </button>
         </Col>
@@ -122,6 +143,7 @@ function MessageForm() {
             onClick={handleOpenImageRef}
             className="message-form-button"
             style={{ width: '100%' }}
+            disabled={loading}
           >
             UPLOAD
           </button>
