@@ -11,6 +11,9 @@ class MainPanel extends Component {
     messages: [],
     messagesRef: ref(db, 'messages'),
     messagesLoading: true,
+    searchTerm: '',
+    searchResults: [],
+    searchLoading: false,
   };
 
   componentDidMount() {
@@ -39,12 +42,34 @@ class MainPanel extends Component {
       <Message key={message.timestamp} message={message} user={this.props.user} />
     ));
 
+  handleSearchMessages = () => {
+    const chatRoomMessages = [...this.state.messages];
+    const regex = new RegExp(this.state.searchTerm, 'gi');
+    const searchResults = chatRoomMessages.reduce((acc, message) => {
+      if ((message.content && message.content.match(regex)) || message.user.name.match(regex)) {
+        acc.push(message);
+      }
+      return acc;
+    }, []);
+    this.setState({ searchResults, searchLoading: false });
+  };
+
+  handleSearchChange = event => {
+    this.setState(
+      {
+        searchTerm: event.target.value,
+        searchLoading: true,
+      },
+      this.handleSearchMessages,
+    );
+  };
+
   render() {
-    const { messages } = this.state;
+    const { searchTerm, messages, searchResults } = this.state;
 
     return (
       <div style={{ padding: '2rem 2rem 0 2rem' }}>
-        <MessageHeader />
+        <MessageHeader handleSearchChange={this.handleSearchChange} />
 
         <div
           style={{
@@ -57,7 +82,7 @@ class MainPanel extends Component {
             overflowY: 'auto',
           }}
         >
-          {this.renderMessages(messages)}
+          {searchTerm ? this.renderMessages(searchResults) : this.renderMessages(messages)}
         </div>
 
         <MessageForm />

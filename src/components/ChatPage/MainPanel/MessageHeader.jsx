@@ -11,7 +11,7 @@ import { FaLock } from 'react-icons/fa';
 import { MdFavorite } from 'react-icons/md';
 import { AiOutlineSearch } from 'react-icons/ai';
 
-function MessageHeader() {
+function MessageHeader({ handleSearchChange }) {
   return (
     <div
       style={{
@@ -39,6 +39,7 @@ function MessageHeader() {
                 placeholder="Search Message"
                 aria-label="Search"
                 aria-describedby="basic-addon1"
+                onChange={handleSearchChange}
               />
             </InputGroup>
           </Col>
