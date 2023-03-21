@@ -15,32 +15,27 @@ class DirectMessages extends Component {
   }
 
   addUsersListeners = currentUserId => {
-    let usersArray = [];
-
     onValue(this.state.usersRef, snapshot => {
-      const snapshotObj = snapshot.val();
-      Object.keys(snapshotObj).forEach(key => {
-        if (currentUserId !== key) {
-          let user = snapshotObj[key];
-          user['uid'] = key;
-          user['status'] = 'offline';
-          usersArray.push(user);
-        }
-      });
+      const usersArray = Object.entries(snapshot.val())
+        .filter(([key]) => currentUserId !== key)
+        .map(([key, user]) => ({ ...user, uid: key, status: 'offline' }));
+
       this.setState({ users: usersArray });
     });
   };
 
-  renderDirectMessages = () => {};
+  renderDirectMessages = users =>
+    users.length > 0 && users.map(user => <li key={user.uid}># {user.name}</li>);
 
   render() {
+    const { users } = this.state;
     return (
       <div>
         <span style={{ display: 'flex', alignItems: 'center' }}>
           <FaRegSmile style={{ marginRight: 3 }} /> DIRECT MESSAGES(1)
         </span>
 
-        <ul style={{ listStyleType: 'none', padding: 0 }}>{this.renderDirectMessages()}</ul>
+        <ul style={{ listStyleType: 'none', padding: 0 }}>{this.renderDirectMessages(users)}</ul>
       </div>
     );
   }
