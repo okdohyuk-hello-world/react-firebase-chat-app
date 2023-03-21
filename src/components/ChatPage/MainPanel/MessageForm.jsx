@@ -18,6 +18,7 @@ function MessageForm() {
   const [loading, setLoading] = useState(false);
   const messagesRef = ref(db, 'messages');
   const inputOpenImageRef = useRef();
+  const isPrivateChatRoom = useSelector(state => state.chatRoom.isPrivateChatRoom);
 
   const handleContentChange = e => {
     setContent(e.target.value);
@@ -27,9 +28,17 @@ function MessageForm() {
     inputOpenImageRef.current.click();
   };
 
+  const getPath = () => {
+    if (isPrivateChatRoom) {
+      return `/message/private/${chatRoom.id}`;
+    } else {
+      return '/message/public';
+    }
+  };
+
   const handleUploadImage = e => {
     const file = e.target.files[0];
-    const filePath = `/message/public/${file.name}`;
+    const filePath = `${getPath()}/${file.name}`;
     const metadata = { contentType: mime.lookup(file.name) };
     const storageRef = sRef(storage, filePath);
 

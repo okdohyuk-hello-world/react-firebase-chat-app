@@ -7,11 +7,14 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import Image from 'react-bootstrap/Image';
 import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
-import { FaLock } from 'react-icons/fa';
+import { FaLock, FaLockOpen } from 'react-icons/fa';
 import { MdFavorite } from 'react-icons/md';
 import { AiOutlineSearch } from 'react-icons/ai';
+import { useSelector } from 'react-redux';
 
 function MessageHeader({ handleSearchChange }) {
+  const chatRoom = useSelector(state => state.chatRoom.currentChatRoom);
+  const isPrivateChatRoom = useSelector(state => state.chatRoom.isPrivateChatRoom);
   return (
     <div
       style={{
@@ -27,7 +30,8 @@ function MessageHeader({ handleSearchChange }) {
         <Row>
           <Col>
             <h2>
-              <FaLock /> ChatRoomName <MdFavorite />
+              {isPrivateChatRoom ? <FaLock style={{ marginBottom: '10px' }} /> : <FaLockOpen />}{' '}
+              {chatRoom && chatRoom.name} <MdFavorite style={{ marginBottom: '10px' }} />
             </h2>
           </Col>
           <Col>
