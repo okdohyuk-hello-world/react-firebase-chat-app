@@ -17,9 +17,11 @@ class ChatRooms extends Component {
     description: '',
     isDesabled: true,
     chatRoomsRef: ref(db, 'chatRooms'),
+    messageRef: ref(db, 'messages'),
     chatRooms: [],
     isFirstLoad: true,
     activeChatRoomId: '',
+    notifications: [],
   };
 
   componentDidMount() {
@@ -63,7 +65,23 @@ class ChatRooms extends Component {
 
   addChatRoomsListeners = () => {
     onValue(this.state.chatRoomsRef, snapshot => {
-      this.setState({ chatRooms: Object.values(snapshot.val()) }, () => this.setFirstChatRoom());
+      const chatRoomArray = Object.values(snapshot.val());
+      this.setState({ chatRooms: chatRoomArray }, () => this.setFirstChatRoom());
+
+      chatRoomArray.forEach(room => this.addNotificationListener(room.id));
+    });
+  };
+
+  addNotificationListener = chatRoomId => {
+    onValue(child(this.state.messageRef, chatRoomId), snapshot => {
+      if (this.props.chatRoom) {
+        this.handleNotification(
+          chatRoomId,
+          this.props.chatRoom.id,
+          this.state.notifications,
+          snapshot,
+        );
+      }
     });
   };
 
@@ -113,6 +131,14 @@ class ChatRooms extends Component {
     this.props.dispatch(setCurrentChatRoom(room));
     this.props.dispatch(setPrivateChatRoom(false));
     this.setState({ activeChatRoomId: room.id });
+  };
+
+  handleNotification = (chatRoomId, currentChatRoomId, notifications, snapshot) => {
+    console.log();
+
+    // 이미 notifications state 안에 알림 정보가 있는 채팅방과 그렇지 않는 것을 나눠주기
+
+    // 목표는 방 하나 하나의 맞는 정보를 넣어주기
   };
 
   handleModalClose = () => this.setState({ isModalShow: false });
@@ -187,7 +213,7 @@ class ChatRooms extends Component {
 }
 
 const mapStateToProps = state => {
-  return { user: state.user.currentUser };
+  return { user: state.user.currentUser, chatRoom: state.chatRoom.currentChatRoom };
 };
 
 export default connect(mapStateToProps)(ChatRooms);
