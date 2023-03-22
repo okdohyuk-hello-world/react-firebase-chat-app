@@ -10,7 +10,11 @@ function Message({ message, user }) {
     return message.hasOwnProperty('image') && !message.hasOwnProperty('content');
   };
 
-  const isMessageMine = (message, user) => message.user.id === user.uid;
+  const isMessageMine = (message, user) => {
+    if (user) return message.user.id === user.uid;
+
+    return false;
+  };
 
   return (
     <Card
