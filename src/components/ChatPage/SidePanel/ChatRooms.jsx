@@ -30,6 +30,7 @@ class ChatRooms extends Component {
 
   componentWillUnmount() {
     off(this.state.chatRoomsRef);
+    off(this.state.messageRef);
   }
 
   componentWillUpdate(nextProps, { isDesabled, name, description }) {
@@ -144,6 +145,18 @@ class ChatRooms extends Component {
     this.props.dispatch(setCurrentChatRoom(room));
     this.props.dispatch(setPrivateChatRoom(false));
     this.setState({ activeChatRoomId: room.id });
+    this.clearNotifications(room.id);
+  };
+
+  clearNotifications = roomId => {
+    let index = this.state.notifications.findIndex(notification => notification.id === roomId);
+
+    if (index !== -1) {
+      let updatedNotifications = [...this.state.notifications];
+      updatedNotifications[index].lastKnownTotal = this.state.notifications[index].total;
+      updatedNotifications[index].count = 0;
+      this.setState({ notifications: updatedNotifications });
+    }
   };
 
   handleNotification = (chatRoomId, currentChatRoomId, notifications, snapshot) => {
