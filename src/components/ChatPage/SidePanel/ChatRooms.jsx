@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import { ref, child, push, update, onValue, off } from 'firebase/database';
 import { db } from '../../../assets/firebase';
 import { setCurrentChatRoom, setPrivateChatRoom } from '../../../redux/actions/chatRoomAction';
+import Badge from 'react-bootstrap/Badge';
 
 class ChatRooms extends Component {
   state = {
@@ -48,10 +49,15 @@ class ChatRooms extends Component {
         onClick={() => this.changeChatRoom(room)}
         style={{
           cursor: 'pointer',
+          width: '100%',
+          display: 'flex',
+          marginBottom: 2,
+          justifyContent: 'space-between',
           backgroundColor: room.id === this.state.activeChatRoomId && '#ffffff45',
         }}
       >
-        # {room.name}
+        <span># {room.name}</span>
+        <Badge bg="danger">1</Badge>
       </li>
     ));
 
