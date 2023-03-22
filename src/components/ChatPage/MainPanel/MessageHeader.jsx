@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -12,7 +12,7 @@ import { MdFavorite, MdFavoriteBorder } from 'react-icons/md';
 import { AiOutlineSearch } from 'react-icons/ai';
 import { useSelector } from 'react-redux';
 import { db } from '../../../assets/firebase';
-import { ref, child, update, remove } from 'firebase/database';
+import { ref, child, update, remove, get } from 'firebase/database';
 
 function MessageHeader({ handleSearchChange }) {
   const chatRoom = useSelector(state => state.chatRoom.currentChatRoom);
@@ -20,6 +20,17 @@ function MessageHeader({ handleSearchChange }) {
   const [isFavorited, setIsFavorited] = useState(false);
   const userRef = ref(db, 'users');
   const user = useSelector(state => state.user.currentUser);
+
+  useEffect(() => {
+    if (chatRoom && user) addFavoriteListener(chatRoom.id, user.uid);
+  }, []);
+
+  const addFavoriteListener = (chatRoomId, userId) => {
+    get(child(userRef, `${userId}/favorited`)).then(res => {
+      const favoriteChatRooms = res.val();
+      if (favoriteChatRooms) setIsFavorited(Object.keys(favoriteChatRooms).includes(chatRoomId));
+    });
+  };
 
   const handleFavorite = () => {
     if (isFavorited) {
