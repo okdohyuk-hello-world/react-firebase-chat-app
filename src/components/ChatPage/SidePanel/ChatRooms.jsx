@@ -43,6 +43,19 @@ class ChatRooms extends Component {
     }
   }
 
+  getNotificationCount = room => {
+    // 해당 채팅방의 count수를 구하는 중입니다.
+    let count = 0;
+
+    this.state.notifications.forEach(notification => {
+      if (notification.id === room.id) {
+        count = notification.count;
+      }
+    });
+
+    if (count > 0) return count;
+  };
+
   renderChatRooms = chatRooms =>
     chatRooms.length &&
     chatRooms.map(room => (
@@ -59,7 +72,7 @@ class ChatRooms extends Component {
         }}
       >
         <span># {room.name}</span>
-        <Badge bg="danger">1</Badge>
+        <Badge bg="danger">{this.getNotificationCount(room)}</Badge>
       </li>
     ));
 
@@ -134,11 +147,38 @@ class ChatRooms extends Component {
   };
 
   handleNotification = (chatRoomId, currentChatRoomId, notifications, snapshot) => {
-    console.log();
+    let lastTotal = 0;
 
     // 이미 notifications state 안에 알림 정보가 있는 채팅방과 그렇지 않는 것을 나눠주기
+    let index = notifications.findIndex(notification => notification.id === chatRoomId);
+
+    if (index === -1) {
+      notifications.push({
+        id: chatRoomId,
+        total: snapshot.size,
+        lastKnownTotal: snapshot.size,
+        count: 0,
+      });
+    }
+    // 이미 해당 채팅방의 알림 정보가 있을 때
+    else {
+      // 상대방이 채팅 보내는 그 해당 채팅방에 있지 않을 때
+      if (chatRoomId !== currentChatRoomId) {
+        // 현재까지 유저가 확인한 총 메시지 개수
+        lastTotal = notifications[index].lastKnownTotal;
+
+        // count 알림으로 보여줄 숫자를 구하기
+        // 현재 총 메시기 개수 - 이전에 확인한 총 메시지 개수
+        // 현재 총 메시지 개수가 10개이고 이전에 확인한 메시지가 총 8개 있다면, 2개를 알림으로 보여줘야함.
+        if (snapshot.size - lastTotal > 0) {
+          notifications[index].count = snapshot.size - lastTotal;
+        }
+      }
+      notifications[index].total = snapshot.size;
+    }
 
     // 목표는 방 하나 하나의 맞는 정보를 넣어주기
+    this.setState({ notifications });
   };
 
   handleModalClose = () => this.setState({ isModalShow: false });
