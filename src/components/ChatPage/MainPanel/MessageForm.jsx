@@ -26,6 +26,11 @@ function MessageForm() {
     onContentsChange(content);
   }, [content]);
 
+  useEffect(() => {
+    if (!chatRoom || !user) return;
+    return () => onContentsChange();
+  }, []);
+
   const handleContentChange = e => {
     setContent(e.target.value);
   };
