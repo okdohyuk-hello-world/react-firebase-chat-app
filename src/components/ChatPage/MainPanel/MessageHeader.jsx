@@ -40,6 +40,7 @@ function MessageHeader({ handleSearchChange }) {
     } else {
       update(child(userRef, `${user.uid}/favorited`), {
         [chatRoom.id]: {
+          id: chatRoom.id,
           name: chatRoom.name,
           description: chatRoom.description,
           createdBy: {
