@@ -91,17 +91,19 @@ function MessageHeader({ handleSearchChange }) {
             </InputGroup>
           </Col>
         </Row>
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <p>
-            <Image
-              src={chatRoom && chatRoom.createdBy.image}
-              roundedCircle
-              style={{ width: 30, height: 30 }}
-              alt={chatRoom && chatRoom.createdBy.name}
-            />{' '}
-            {chatRoom && chatRoom.createdBy.name}
-          </p>
-        </div>
+        {chatRoom && chatRoom.createdBy && (
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <p>
+              <Image
+                src={chatRoom.createdBy.image}
+                roundedCircle
+                style={{ width: 30, height: 30 }}
+                alt={chatRoom.createdBy.name}
+              />{' '}
+              {chatRoom.createdBy.name}
+            </p>
+          </div>
+        )}
         <Row>
           <Col>
             <Accordion>
