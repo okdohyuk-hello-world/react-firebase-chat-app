@@ -11,10 +11,12 @@ class MainPanel extends Component {
   state = {
     messages: [],
     messagesRef: ref(db, 'messages'),
+    typingRef: ref(db, 'typing'),
     messagesLoading: true,
     searchTerm: '',
     searchResults: [],
     searchLoading: false,
+    typingUsers: [],
   };
 
   componentDidMount() {
@@ -22,12 +24,26 @@ class MainPanel extends Component {
 
     if (chatRoom) {
       this.addMessagesListeners(chatRoom.id);
+      this.addTypingListeners(chatRoom.id);
     }
   }
 
   componentWillUnmount() {
     off(this.state.messagesRef);
   }
+
+  addTypingListeners = chatRoomId => {
+    onValue(child(this.state.typingRef, chatRoomId), snapshot => {
+      let typingUsers = [];
+      if (snapshot.val() !== null)
+        typingUsers = Object.entries(snapshot.val())
+          .filter(([key]) => key !== this.props.user.uid)
+          .map(([key, value]) => {
+            return { id: key, name: value };
+          });
+      this.setState({ typingUsers });
+    });
+  };
 
   addMessagesListeners = chatRoomId => {
     onValue(child(this.state.messagesRef, chatRoomId), snapshot => {
@@ -83,6 +99,7 @@ class MainPanel extends Component {
 
   render() {
     const { searchTerm, messages, searchResults } = this.state;
+    console.log(this.state.typingUsers);
 
     return (
       <div style={{ padding: '2rem 2rem 0 2rem' }}>
