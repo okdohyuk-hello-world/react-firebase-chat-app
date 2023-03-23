@@ -1,10 +1,10 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import ProgressBar from 'react-bootstrap/ProgressBar';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import { db, storage } from '../../../assets/firebase';
-import { ref, serverTimestamp, push, child } from 'firebase/database';
+import { ref, serverTimestamp, set, push, child, remove } from 'firebase/database';
 import { ref as sRef, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { useSelector } from 'react-redux';
 import mime from 'mime-types';
@@ -17,8 +17,14 @@ function MessageForm() {
   const [percentage, setPercentage] = useState(0);
   const [loading, setLoading] = useState(false);
   const messagesRef = ref(db, 'messages');
+  const typingRef = ref(db, 'typing');
   const inputOpenImageRef = useRef();
   const isPrivateChatRoom = useSelector(state => state.chatRoom.isPrivateChatRoom);
+
+  useEffect(() => {
+    if (!chatRoom || !user) return;
+    onContentsChange(content);
+  }, [content]);
 
   const handleContentChange = e => {
     setContent(e.target.value);
@@ -108,6 +114,14 @@ function MessageForm() {
       }, 5000);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const onContentsChange = content => {
+    if (content) {
+      set(child(typingRef, `${chatRoom.id}/${user.uid}`), user.displayName);
+    } else {
+      remove(child(typingRef, `${chatRoom.id}/${user.uid}`));
     }
   };
 
