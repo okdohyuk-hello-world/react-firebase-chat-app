@@ -93,7 +93,13 @@ function MessageHeader({ handleSearchChange }) {
         </Row>
         <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
           <p>
-            <Image src="" /> {''}user name
+            <Image
+              src={chatRoom && chatRoom.createdBy.image}
+              roundedCircle
+              style={{ width: 30, height: 30 }}
+              alt={chatRoom && chatRoom.createdBy.name}
+            />{' '}
+            {chatRoom && chatRoom.createdBy.name}
           </p>
         </div>
         <Row>
@@ -101,10 +107,10 @@ function MessageHeader({ handleSearchChange }) {
             <Accordion>
               <Card>
                 <Card.Header>
-                  <Accordion.Button eventKey="0">123</Accordion.Button>
+                  <Accordion.Button eventKey="0">Description</Accordion.Button>
                 </Card.Header>
                 <Accordion.Body eventKey="0">
-                  <Card.Body>Hello! I'm the body</Card.Body>
+                  <Card.Body>{chatRoom && chatRoom.description}</Card.Body>
                 </Accordion.Body>
               </Card>
             </Accordion>
