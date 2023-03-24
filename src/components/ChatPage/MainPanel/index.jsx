@@ -30,6 +30,7 @@ class MainPanel extends Component {
 
   componentWillUnmount() {
     off(this.state.messagesRef);
+    off(this.state.typingRef)
   }
 
   addTypingListeners = chatRoomId => {
@@ -97,8 +98,12 @@ class MainPanel extends Component {
     );
   };
 
+  renderTypingUsers = typingUsers =>
+    typingUsers.length > 0 &&
+    typingUsers.map(user => <span>{user.name}님이 채팅을 입력하고 있습니다...</span>);
+
   render() {
-    const { searchTerm, messages, searchResults } = this.state;
+    const { searchTerm, messages, searchResults, typingUsers } = this.state;
     console.log(this.state.typingUsers);
 
     return (
@@ -117,6 +122,8 @@ class MainPanel extends Component {
           }}
         >
           {searchTerm ? this.renderMessages(searchResults) : this.renderMessages(messages)}
+
+          {this.renderTypingUsers(typingUsers)}
         </div>
 
         <MessageForm />
