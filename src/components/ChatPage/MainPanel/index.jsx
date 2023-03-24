@@ -30,7 +30,7 @@ class MainPanel extends Component {
 
   componentWillUnmount() {
     off(this.state.messagesRef);
-    off(this.state.typingRef)
+    off(this.state.typingRef);
   }
 
   addTypingListeners = chatRoomId => {
