@@ -111,7 +111,6 @@ class MainPanel extends Component {
 
   render() {
     const { searchTerm, messages, searchResults, typingUsers } = this.state;
-    console.log(this.state.typingUsers);
 
     return (
       <div style={{ padding: '2rem 2rem 0 2rem' }}>
