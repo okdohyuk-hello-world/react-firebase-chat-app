@@ -130,11 +130,21 @@ function MessageForm() {
     }
   };
 
+  const handleKeyDown = e => {
+    if (e.ctrlKey && e.keyCode === 13) handleSubmit();
+  };
+
   return (
     <div>
       <Form onSubmit={handleSubmit}>
         <Form.Group>
-          <Form.Control as="textarea" rows={3} value={content} onChange={handleContentChange} />
+          <Form.Control
+            as="textarea"
+            rows={3}
+            value={content}
+            onChange={handleContentChange}
+            onKeyDown={handleKeyDown}
+          />
         </Form.Group>
       </Form>
 
