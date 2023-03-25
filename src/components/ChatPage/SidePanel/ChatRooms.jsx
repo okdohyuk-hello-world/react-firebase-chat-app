@@ -79,9 +79,8 @@ class ChatRooms extends Component {
 
   addChatRoomsListeners = () => {
     onValue(this.state.chatRoomsRef, snapshot => {
-      const chatRoomArray = Object.values(snapshot.val());
+      const chatRoomArray = Object.values(snapshot.val()).filter(v => typeof v !== 'string');
       this.setState({ chatRooms: chatRoomArray }, () => this.setFirstChatRoom());
-
       chatRoomArray.forEach(room => this.addNotificationListener(room.id));
     });
   };
@@ -124,7 +123,7 @@ class ChatRooms extends Component {
       });
     } catch (e) {
       console.error(e);
-      alert(e);
+      //alert(e);
     } finally {
       this.setState({
         isLoading: false,
